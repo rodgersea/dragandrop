@@ -4,7 +4,7 @@ from werkzeug import secure_filename
 app = Flask(__name__)
 
 
-@app.route('/upload')
+@app.route('/')
 def upload_file():
     return render_template('index.html')
 
