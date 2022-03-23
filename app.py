@@ -31,7 +31,7 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(url_for('download_file', name=filename))
-    return render_template(index.html)
+    return render_template('index.html')
 
 
 @app.route('/uploads/<name>')
