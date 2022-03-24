@@ -23,25 +23,24 @@ def upload_file():
     print('upload_file()\n', file=sys.stderr)
 
     if request.method == 'POST':
-        zf = ZipFile('test.zip', 'w')
-        memory_file = BytesIO()
-        with ZipFile(memory_file, 'w') as zf:
-            upload_files = request.files.getlist('file')
-            for file in upload_files:
-                try:
-                    print('_________________________________', file=sys.stderr)
-                    print('file: ', file.filename, '\n', str(type(file)), file=sys.stderr)
-                except:
-                    pass
-                if file != '':
-                    file.save(secure_filename(str(file)))
-                    data = ZipInfo(file.filename)
-                    data.compress_type = zipfile.ZIP_DEFLATED
-                    zf.writestr(data, file.filename)
-        memory_file.seek(0)
+        upload_files = request.files.getlist('file')
+        zip_buffer = BytesIO()
+        zipfolder = ZipFile(zip_buffer, 'w', compression=zipfile.ZIP_STORED)
 
-        return send_file(memory_file, attachment_filename='test.zip', as_attachment=True)
+        for file in upload_files:
+            try:
+                print('_________________________________', file=sys.stderr)
+                print('file: ', file.filename, '\n', str(type(file)), file=sys.stderr)
+            except:
+                pass
+            file.save(secure_filename(file.filename))
+            zipfolder.write(file.filename)
+        zipfolder.close()
+        zip_buffer.seek(0)
+
+        return send_file(zip_buffer, mimetype='zip', attachment_filename='test.zip', as_attachment=True)
+        # os.remove('test.zip')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, threaded=True)
